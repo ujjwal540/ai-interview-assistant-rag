@@ -1,121 +1,263 @@
-# 🎯 AI Interview Assistant (RAG)
+<div align="center">
 
-A Retrieval-Augmented-Generation app that turns a **resume + job description** into:
+# 🎯 AI Interview Assistant using Retrieval-Augmented Generation (RAG)
 
-1. **Tailored interview questions** (behavioral + technical + gap-probing)
-2. **A live mock interview chat** (Claude asks, you answer, it reacts)
-3. **Answer feedback** — checks your practice answers against your real resume context
+### Turn any Resume and Job Description into your personal AI Interview Coach
 
-## How the pipeline works
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B?logo=streamlit&logoColor=white)
+![LangChain](https://img.shields.io/badge/LangChain-RAG-green)
+![Gemini](https://img.shields.io/badge/LLM-Gemini%202.5%20Flash-blue)
+![FAISS](https://img.shields.io/badge/VectorStore-FAISS-orange)
+![SentenceTransformers](https://img.shields.io/badge/Embeddings-SentenceTransformers-yellow)
+
+</div>
+
+---
+
+# 📖 Overview
+
+AI Interview Assistant is a Retrieval-Augmented Generation (RAG) application that helps candidates prepare for interviews using their own resume and a target job description.
+
+Instead of generating generic interview questions, the application first retrieves relevant information from the uploaded documents using semantic search and then uses an LLM to generate personalized interview questions, conduct mock interviews, and evaluate answers.
+
+---
+
+# 🖼️ Application Preview
+
+<p align="center">
+<img src="app-ui.png" width="100%">
+</p>
+
+<p align="center">
+<b>Figure:</b> AI Interview Assistant built with Streamlit. Upload a resume and job description, build a FAISS knowledge base, generate personalized interview questions, conduct an AI-powered mock interview, and receive detailed answer evaluation using Retrieval-Augmented Generation (RAG).
+</p>
+
+---
+
+# ✨ Features
+
+- 📄 Upload Resume (PDF, DOCX, TXT)
+- 💼 Paste any Job Description
+- 🧠 Build a semantic knowledge base using FAISS
+- 🤖 Generate personalized interview questions
+- 🎤 AI-powered mock interview
+- ✅ Evaluate interview answers with detailed feedback
+- 🔍 Semantic document retrieval using Sentence Transformers
+- ⚡ Supports Gemini, Groq, Anthropic and OpenAI models
+- 💾 Save and reload vector database locally
+
+---
+
+# 🧠 How It Works
 
 ```
-Resume/JD  →  chunk (LangChain splitter)  →  embed (local, free)  →  FAISS vector store
-                                                                          │
-User question / interview turn  ───────────────────────────────►  retrieve top-k chunks
-                                                                          │
-                                                          Claude (Anthropic API) generates
-                                                          questions / feedback / next turn
+                Resume + Job Description
+                          │
+                          ▼
+                 Document Loader
+                          │
+                          ▼
+                 Text Chunking
+                          │
+                          ▼
+        Sentence Transformer Embeddings
+                          │
+                          ▼
+                FAISS Vector Database
+                          │
+                          ▼
+                Similarity Search (RAG)
+                          │
+                          ▼
+          Gemini / Groq / OpenAI / Claude
+                          │
+          ┌───────────────┼────────────────┐
+          ▼               ▼                ▼
+ Interview Questions  Mock Interview  Answer Evaluation
 ```
 
-- **Embeddings** run locally via `sentence-transformers` — no API key, no cost.
-- **Generation** (questions, feedback, mock-interview turns) calls the **Anthropic API** — this is the only key you need.
-- You can optionally swap either half to OpenAI (see `.env.example`).
+---
 
-## 1. Project setup
+# 📂 Project Structure
 
-### Create and activate a virtual environment
+```
+ai-interview-assistant-rag/
+│
+├── app.py
+├── README.md
+├── requirements.txt
+├── .env.example
+│
+├── src/
+│   ├── config.py
+│   ├── prompts.py
+│   ├── ingest.py
+│   ├── vectorstore.py
+│   ├── rag_pipeline.py
+│   ├── question_generator.py
+│   ├── answer_evaluator.py
+│   └── mock_interview.py
+│
+├── scripts/
+│   └── build_index.py
+│
+├── data/
+│   ├── resumes/
+│   └── job_descriptions/
+│
+├── vectorstore/
+│
+└── app-ui.png
+```
+
+---
+
+# 🛠️ Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Language | Python |
+| UI | Streamlit |
+| Framework | LangChain |
+| LLM | Gemini 2.5 Flash |
+| Vector Database | FAISS |
+| Embeddings | Sentence Transformers |
+| PDF Processing | PyPDF |
+| DOCX Processing | python-docx |
+| Environment | python-dotenv |
+
+---
+
+# ⚙️ Installation
+
+## Clone Repository
 
 ```bash
-# from the project root
-python3 -m venv venv
+git clone https://github.com/ujjwal540/ai-interview-assistant-rag.git
 
-# activate it
-source venv/bin/activate        # macOS/Linux
-venv\Scripts\activate           # Windows
+cd ai-interview-assistant-rag
 ```
 
-### Install dependencies
+---
+
+## Create Virtual Environment
+
+### Windows
+
+```bash
+py -3.11 -m venv .venv
+
+.venv\Scripts\activate
+```
+
+### Linux / macOS
+
+```bash
+python3 -m venv .venv
+
+source .venv/bin/activate
+```
+
+---
+
+## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Configure your API key
+---
 
-```bash
-cp .env.example .env
+## Configure Environment
+
+Create a `.env` file.
+
+Example:
+
+```env
+LLM_PROVIDER=gemini
+
+GEMINI_API_KEY=YOUR_API_KEY
+
+EMBEDDING_PROVIDER=local
+
+EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+
+VECTORSTORE_DIR=vectorstore
+
+CHUNK_SIZE=1000
+
+CHUNK_OVERLAP=200
+
+RETRIEVER_TOP_K=4
 ```
 
-Then open `.env` and set:
-
-```
-ANTHROPIC_API_KEY=sk-ant-...your-real-key...
-```
-
-Get a key at https://console.anthropic.com/ → **Settings → API Keys**.
-Everything else in `.env` has a sensible default and can be left as-is.
-
-## 2. Run it
-
-### Option A — Streamlit app (recommended)
+## Run Application
 
 ```bash
 streamlit run app.py
 ```
 
-Then in the browser: upload a resume, paste a job description, click **Build Index**, and use the three tabs.
-
-### Option B — CLI index build (for scripting/batch use)
-
-```bash
-python scripts/build_index.py --resume data/resumes/john.pdf --jd data/job_descriptions/role.txt
-```
-
-This persists the FAISS index to `vectorstore/`, which the Streamlit app can then "Load existing index" on startup.
-
-## 3. Project structure
+Open:
 
 ```
-ai-interview-assistant-rag/
-├── .env.example              # template for API keys & pipeline config
-├── .gitignore
-├── requirements.txt
-├── README.md
-├── app.py                    # Streamlit UI (main entry point)
-├── src/
-│   ├── __init__.py
-│   ├── config.py             # loads & validates env vars
-│   ├── prompts.py            # all prompt templates
-│   ├── ingest.py             # load PDFs/DOCX/TXT, chunk text
-│   ├── vectorstore.py        # build/save/load FAISS index + embeddings
-│   ├── rag_pipeline.py       # LLM getter + retrieval helper
-│   ├── question_generator.py # tailored question generation
-│   ├── answer_evaluator.py   # feedback on a practice answer
-│   └── mock_interview.py     # stateful mock-interview chat session
-├── scripts/
-│   └── build_index.py        # CLI to build the vector index
-├── data/
-│   ├── resumes/               # put resume files here (gitignored)
-│   └── job_descriptions/      # put JD files here (gitignored)
-└── vectorstore/               # persisted FAISS index (gitignored)
+http://localhost:8501
 ```
 
-## 4. Environment variables reference
+---
 
-| Variable | Required | Default | Purpose |
-|---|---|---|---|
-| `ANTHROPIC_API_KEY` | ✅ yes | — | Claude API key for question generation, mock interview, feedback |
-| `CLAUDE_MODEL` | no | `claude-sonnet-5` | Model used for generation |
-| `EMBEDDING_MODEL` | no | `sentence-transformers/all-MiniLM-L6-v2` | Local embedding model |
-| `EMBEDDING_PROVIDER` | no | `local` | `local` (free) or `openai` |
-| `LLM_PROVIDER` | no | `anthropic` | `anthropic` or `openai` |
-| `OPENAI_API_KEY` | only if using OpenAI | — | Needed only if you switch either provider to `openai` |
-| `VECTORSTORE_DIR` | no | `vectorstore` | Where the FAISS index is persisted |
-| `CHUNK_SIZE` / `CHUNK_OVERLAP` | no | `1000` / `200` | Text splitter settings |
-| `RETRIEVER_TOP_K` | no | `4` | How many chunks to retrieve per query |
+# 🚀 Usage
 
-## 5. Notes & next steps
+1. Upload your Resume.
+2. Paste the target Job Description.
+3. Click **Build Knowledge Base**.
+4. Generate personalized interview questions.
+5. Practice using Mock Interview.
+6. Evaluate your answers with AI feedback.
 
-- Swap `FAISS` for `Chroma`/`Pinecone`/`Weaviate` in `src/vectorstore.py` if you need a hosted or persistent multi-user store.
-- Add authentication before deploying the Streamlit app publicly — right now anyone with the URL can use your API key's quota.
-- Deactivate the venv when done: `deactivate`.
+---
+
+# 📌 Example Job Description
+
+```
+We are hiring a Machine Learning Engineer.
+
+Requirements:
+
+• Python
+
+• Machine Learning
+
+• Deep Learning
+
+• TensorFlow
+
+• SQL
+
+• Communication Skills
+```
+
+---
+
+# 🚀 Future Improvements
+
+- 🎙 Voice Interview Support
+- 📊 Interview Performance Dashboard
+- 📈 Resume Improvement Suggestions
+- 🌐 Multi-language Support
+- ☁️ Cloud Deployment
+- 📚 Interview History
+
+---
+
+# 👨‍💻 Author
+
+**Ujjwal Kumar Karn**
+
+GitHub:
+https://github.com/ujjwal540
+
+---
+
+⭐ If you found this project useful, consider giving it a Star on GitHub.
