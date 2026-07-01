@@ -1,0 +1,21 @@
+# secrets
+.env
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# generated data
+vectorstore/*
+!vectorstore/.gitkeep
+data/resumes/*
+data/job_descriptions/*
+!data/resumes/.gitkeep
+!data/job_descriptions/.gitkeep
+
+# os/editor
+.DS_Store
+.vscode/

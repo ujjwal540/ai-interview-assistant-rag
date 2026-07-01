@@ -1,0 +1,26 @@
+# LLM + orchestration
+langchain==0.3.7
+langchain-google-genai==2.0.7
+langchain-community==0.3.5
+langchain-huggingface==0.1.2
+langchain-text-splitters==0.3.2
+
+# Vector store + embeddings
+faiss-cpu==1.14.3
+sentence-transformers==3.2.1
+
+# Document loading
+pypdf==5.1.0
+python-docx==1.1.2
+
+# App + config
+streamlit==1.39.0
+python-dotenv==1.0.1
+
+# Gemini
+google-generativeai==0.8.4
+
+# Utilities
+numpy
+pandas
+tiktoken
